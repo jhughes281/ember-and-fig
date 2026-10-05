@@ -109,6 +109,9 @@ button{font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;
 .card:hover .flame-in,.lit .flame-in{animation:flicker 2.6s ease-in-out infinite}
 @keyframes flicker{0%,100%{transform:scale(1,1) skewX(0)}30%{transform:scale(.94,1.06) skewX(-2deg)}55%{transform:scale(1.04,.96) skewX(1.5deg)}80%{transform:scale(.97,1.03) skewX(-1deg)}}
 .flame-in{transform-box:fill-box;transform-origin:50% 100%}
+.reeds{transform-box:fill-box;transform-origin:50% 100%}
+.card:hover .reeds{animation:sway 3.2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(0)}35%{transform:rotate(-1.6deg)}70%{transform:rotate(1.2deg)}}
 .lid{transition:transform .5s cubic-bezier(.2,.8,.3,1)}
 .card:hover .lid,.card:focus-within .lid{transform:translate(118px,58px) rotate(14deg)}
 
@@ -286,7 +289,7 @@ legend{font-family:var(--sans);font-size:12px;letter-spacing:.08em;text-transfor
 <main id="top">
   <section class="hero" aria-label="Collection header">
     <h1 class="sr-only">All Candles</h1>
-    <a class="hero__link" href="#shop">
+    <a class="hero__link" href="#shop" data-show="cols:Aromatic Collection">
       <img src="images/aromatic-collection-banner.webp" width="1919" height="820" fetchpriority="high"
         alt="Introducing the Aromatic Collection: curated scents to elevate every moment. Amber-glass candles and reed diffusers in Sandalwood, Santal Noir, Vanilla Smoke, Spiced Amber and Golden Fig. Shop the collection.">
     </a>
@@ -316,7 +319,7 @@ legend{font-family:var(--sans);font-size:12px;letter-spacing:.08em;text-transfor
 
   <section class="cats" aria-label="Shop other categories">
     <a class="cat" href="#shop"><div data-art="cat-candles"></div><span>Shop candles</span></a>
-    <a class="cat" href="#shop"><div data-art="cat-diffuser"></div><span>Shop diffusers</span></a>
+    <a class="cat" href="#shop" data-show="types:Diffuser"><div data-art="cat-diffuser"></div><span>Shop diffusers</span></a>
     <a class="cat" href="#shop"><div data-art="cat-spray"></div><span>Shop room sprays</span></a>
     <a class="cat" href="#shop"><div data-art="cat-wash"></div><span>Shop hand wash</span></a>
   </section>
@@ -557,9 +560,36 @@ function wrap(inner, { bg = '#F3F1EE', floor = '#EEEBE6', vb = '0 0 400 510', la
   </svg>`;
 }
 
+/* Amber reed diffuser; the reeds sway on hover */
+function diffuser(o) {
+  const id = uid();
+  const { cx, base } = o, w = 150, h = 190, top = base - h;
+  const defs = shadeDef(id, GLASS.amber.body) + SHEEN(id);
+  const body = `M${cx - w / 2} ${top + 34} Q${cx - w / 2} ${top} ${cx - 30} ${top - 4} L${cx + 30} ${top - 4} Q${cx + w / 2} ${top} ${cx + w / 2} ${top + 34} L${cx + w / 2 - 2} ${base - 12} Q${cx + w / 2 - 3} ${base} ${cx + w / 2 - 16} ${base} L${cx - w / 2 + 16} ${base} Q${cx - w / 2 + 3} ${base} ${cx - w / 2 + 2} ${base - 12}Z`;
+  const neckTop = top - 34;
+  const reeds = [-34, -20, -7, 6, 19, 32].map((dx, i) =>
+    `<line x1="${cx - 8 + i * 3}" y1="${neckTop + 6}" x2="${cx + dx * 3.4}" y2="${42 + (i % 3) * 16}" stroke="#1E1A17" stroke-width="3.2" stroke-linecap="round"/>`).join('');
+  const c = GLASS.amber.ink, ly = top + h * .42, fs = 9.5;
+  return {
+    defs,
+    g: `<g>
+      <ellipse cx="${cx + 40}" cy="${base - 2}" rx="${w * .65}" ry="12" fill="url(#sh)"/>
+      <g class="reeds">${reeds}</g>
+      <rect x="${cx - 18}" y="${neckTop}" width="36" height="34" fill="#5A2C10"/>
+      <rect x="${cx - 22}" y="${neckTop - 4}" width="44" height="10" rx="2" fill="#3E1D09"/>
+      <path d="${body}" fill="url(#${id}b)"/>
+      <path d="${body}" fill="url(#${id}s)"/>
+      <text x="${cx}" y="${ly}" text-anchor="middle" font-family="Newsreader, serif" font-size="${fs}" letter-spacing="${fs * .3}" fill="${c}">${o.name}</text>
+      ${[0, 1, 2].map(i => `<line x1="${cx - 34}" x2="${cx + 16 + (i % 2) * 14}" y1="${ly + 20 + i * 11}" y2="${ly + 20 + i * 11}" stroke="${c}" stroke-width="3" stroke-dasharray="4.5 2.5" opacity=".45"/>`).join('')}
+      <text x="${cx}" y="${base - 30}" text-anchor="middle" font-family="Archivo, sans-serif" font-size="5.2" letter-spacing="1.6" fill="${c}" opacity=".75">AROMATIC DIFFUSER</text>
+    </g>`
+  };
+}
+
 function productArt(p) {
   const v = p.art, label = p.title;
   const grow = (part, k, cx, cy) => ({ defs: part.defs, g: `<g transform="translate(${cx} ${cy}) scale(${k}) translate(${-cx} ${-cy})">${part.g}</g>` });
+  if (v.kind === 'diffuser') return wrap(diffuser({ cx: 200, base: 430, name: v.name }), { label });
   if (v.kind === 'jar') return wrap(grow(jar({ cx: 200, base: 400, name: v.name }), 1.3, 200, 420), { label });
   if (v.kind === 'tins') return wrap(grow(tins(), 1.2, 220, 400), { label });
   if (v.kind === 'set') return wrap(grow(giftSet({ base: 410, items: v.items }), 1.25, 205, 420), { label });
@@ -641,6 +671,20 @@ function catArt(kind) {
    Catalogue
    ========================================================= */
 const PRODUCTS = [
+  { id: 'sandalwood', title: 'Sandalwood 2-Wick Candle', meta: 'Scent family: Woody / Floral', smells: 'Violet and cardamom over sandalwood, cedar and orris, settling into amber and musk.', price: 45, badges: ['new'], type: '2-Wick', fam: ['Woody', 'Floral'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'tumbler', glass: 'amber', name: 'SANDALWOOD' } },
+  { id: 'santal-noir-diffuser', title: 'Santal Noir Reed Diffuser', meta: 'Scent family: Woody / Leather', smells: 'Bergamot and papyrus, iris and sandalwood, with amber, leather and musk underneath.', price: 38, badges: ['new'], type: 'Diffuser', fam: ['Woody'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'diffuser', name: 'SANTAL NOIR' } },
+  { id: 'vanilla-smoke', title: 'Vanilla Smoke 2-Wick Candle', meta: 'Scent family: Gourmand / Smoky', smells: 'Clove and brown sugar, vanilla, tobacco and tonka over smoked wood.', price: 45, badges: ['new'], type: '2-Wick', fam: ['Gourmand', 'Woody'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'tumbler', glass: 'amber', name: 'VANILLA SMOKE' } },
+  { id: 'spiced-amber', title: 'Spiced Amber 2-Wick Candle', meta: 'Scent family: Spice / Amber', smells: 'Orange peel and cinnamon, clove, nutmeg and cedar on an amber and patchouli base.', price: 45, badges: ['new'], type: '2-Wick', fam: ['Spice', 'Woody'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'tumbler', glass: 'amber', name: 'SPICED AMBER' } },
+  { id: 'golden-fig-diffuser', title: 'Golden Fig Reed Diffuser', meta: 'Scent family: Fruit / Green', smells: 'Fig and green leaves, coconut and jasmine, finished with amber, vanilla and tonka.', price: 38, badges: ['new'], type: 'Diffuser', fam: ['Fruit', 'Green'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'diffuser', name: 'GOLDEN FIG' } },
+  { id: 'santal-noir', title: 'Santal Noir 2-Wick Candle', meta: 'Scent family: Woody / Leather', smells: 'Bergamot and papyrus, iris and sandalwood, with amber, leather and musk underneath.', price: 45, badges: ['new'], type: '2-Wick', fam: ['Woody'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'tumbler', glass: 'amber', name: 'SANTAL NOIR' } },
+  { id: 'golden-fig', title: 'Golden Fig 2-Wick Candle', meta: 'Scent family: Fruit / Green', smells: 'Fig and green leaves, coconut and jasmine, finished with amber, vanilla and tonka.', price: 45, badges: ['new'], type: '2-Wick', fam: ['Fruit', 'Green'], col: 'Aromatic Collection', order: 0,
+    art: { kind: 'tumbler', glass: 'amber', name: 'GOLDEN FIG' } },
   { id: 'passport', title: 'The Passport Trio · Set of 3', meta: 'Gift set', smells: 'Hillcroft, Bellaire and Navigation in travel tumblers.', price: 110, compare: 126, badges: ['new', 'save'], type: 'Gift set', fam: [], order: 3,
     art: { kind: 'set', items: [{ glass: 'amber', name: '' }, { glass: 'smoke', name: '' }, { glass: 'amber', name: '' }] } },
   { id: 'marigold', title: 'Marigold 2-Wick Candle', meta: 'Scent family: Floral / Spice', smells: 'Cempasúchil, copal and pan de muerto.', price: 45, badges: ['limited'], type: '2-Wick', fam: ['Floral', 'Spice'], order: 1,
@@ -678,10 +722,11 @@ const PRODUCTS = [
   { id: 'discovery', title: 'Discovery Set · 6 Travel Tins', meta: 'Gift set', smells: 'Six neighborhoods, one evening each.', price: 48, badges: [], type: 'Gift set', fam: [], order: 3,
     art: { kind: 'tins' } },
 ];
+PRODUCTS.forEach(p => { p.col = p.col || 'Houston Neighborhoods'; });
 const BADGE = { limited: ['Limited edition', ''], new: ['New', ''], save: [null, 'badge--save'], out: ['Sold out', 'badge--out'] };
 const TILES = [
   { at: 5, id: 'subscribe', title: 'A new Houston neighborhood in your mailbox every month', link: 'Learn more', art: subscribeArt },
-  { at: 12, id: 'bundle', title: 'Pick any three jars, save 15%', link: 'Build a bundle', art: bundleArt },
+  { at: 16, id: 'bundle', title: 'Pick any three jars, save 15%', link: 'Build a bundle', art: bundleArt },
 ];
 
 /* ---------- currency ---------- */
@@ -696,7 +741,7 @@ const money = usd => {
 };
 
 /* ---------- state ---------- */
-const state = { sort: 'featured', types: new Set(), fams: new Set(), q: '' };
+const state = { sort: 'featured', cols: new Set(), types: new Set(), fams: new Set(), q: '' };
 let cart = [], wish = new Set();
 try { cart = JSON.parse(localStorage.getItem('mh-cart') || '[]'); wish = new Set(JSON.parse(localStorage.getItem('mh-wish') || '[]')); } catch (e) {}
 const save = () => { try { localStorage.setItem('mh-cart', JSON.stringify(cart)); localStorage.setItem('mh-wish', JSON.stringify([...wish])); localStorage.setItem('mh-cur', cur); } catch (e) {} };
@@ -732,6 +777,7 @@ function tile(t) {
 
 function visible() {
   let list = PRODUCTS.filter(p => {
+    if (state.cols.size && !state.cols.has(p.col)) return false;
     if (state.types.size && !state.types.has(p.type)) return false;
     if (state.fams.size && !p.fam.some(f => state.fams.has(f))) return false;
     if (state.q) {
@@ -753,26 +799,28 @@ function visible() {
 const grid = document.getElementById('grid');
 function render() {
   const list = visible();
-  const filtered = state.types.size || state.fams.size || state.q || state.sort !== 'featured';
+  const filtered = state.cols.size || state.types.size || state.fams.size || state.q || state.sort !== 'featured';
   let html = '';
   list.forEach((p, i) => {
     if (!filtered) TILES.filter(t => t.at === i).forEach(t => html += tile(t));
     html += card(p);
   });
-  if (!list.length) html = `<p class="empty">No candles match those filters. <button type="button" id="emptyClear">Clear filters</button></p>`;
+  if (!list.length) html = `<p class="empty">Nothing matches those filters. <button type="button" id="emptyClear">Clear filters</button></p>`;
   grid.innerHTML = html;
-  const n = state.types.size + state.fams.size;
+  const n = state.cols.size + state.types.size + state.fams.size;
   document.getElementById('filterN').textContent = n ? ` (${n})` : '';
-  document.getElementById('count').textContent = state.q ? `${list.length} results for “${state.q}”` : `${list.length} candles &amp; sets`.replace('&amp;', '&');
+  document.getElementById('count').textContent = state.q ? `${list.length} results for “${state.q}”` : `${list.length} products`;
 }
 
 /* ---------- filter drawer ---------- */
-const TYPES = ['2-Wick', 'XL 3-Wick', 'Jar', 'Gift set'];
+const COLS = ['Aromatic Collection', 'Houston Neighborhoods'];
+const TYPES = ['2-Wick', 'XL 3-Wick', 'Jar', 'Diffuser', 'Gift set'];
 const FAMS = ['Citrus', 'Floral', 'Fresh', 'Fruit', 'Gourmand', 'Green', 'Spice', 'Woody'];
 function renderFilters() {
   const box = (group, v, set) => `<label class="check"><input type="checkbox" data-f="${group}" value="${v}" ${set.has(v) ? 'checked' : ''}>${v}</label>`;
   document.getElementById('filterBody').innerHTML =
-    `<fieldset><legend>Candle type</legend>${TYPES.map(t => box('types', t, state.types)).join('')}</fieldset>
+    `<fieldset><legend>Collection</legend>${COLS.map(c => box('cols', c, state.cols)).join('')}</fieldset>
+     <fieldset><legend>Product type</legend>${TYPES.map(t => box('types', t, state.types)).join('')}</fieldset>
      <fieldset><legend>Scent family</legend>${FAMS.map(f => box('fams', f, state.fams)).join('')}</fieldset>`;
 }
 document.getElementById('filterBody').addEventListener('change', e => {
@@ -780,7 +828,7 @@ document.getElementById('filterBody').addEventListener('change', e => {
   state[i.dataset.f][i.checked ? 'add' : 'delete'](i.value);
   render();
 });
-function clearAll() { state.types.clear(); state.fams.clear(); state.q = ''; document.getElementById('q').value = ''; renderFilters(); render(); }
+function clearAll() { state.cols.clear(); state.types.clear(); state.fams.clear(); state.q = ''; document.getElementById('q').value = ''; renderFilters(); render(); }
 document.getElementById('clearFilters').addEventListener('click', clearAll);
 document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
 
@@ -861,7 +909,13 @@ document.addEventListener('click', e => {
   if (t.dataset.rm) { cart = cart.filter(x => x.id !== t.dataset.rm); save(); renderCart(); return; }
   if (t.id === 'checkout') { toast('Checkout opens when the shop launches'); return; }
   if (t.id === 'emptyClear') { clearAll(); return; }
-  if (t.dataset.tile === 'bundle') { e.preventDefault(); state.types = new Set(['Jar']); render(); document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }); }
+  if (t.dataset.tile === 'bundle' || t.dataset.show) {
+    e.preventDefault();
+    const [key, val] = t.dataset.tile === 'bundle' ? ['types', 'Jar'] : t.dataset.show.split(':');
+    state.cols.clear(); state.types.clear(); state.fams.clear();
+    state[key].add(val); render();
+    document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+  }
 });
 
 /* ---------- search ---------- */
