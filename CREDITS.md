@@ -8,7 +8,6 @@ All product and tile photos are placeholders from [Unsplash](https://unsplash.co
 | images/products/santal-noir-diffuser.jpg | Mindaugas Norvilas | https://unsplash.com/photos/SVcN4B044lo |
 | images/products/vanilla-smoke.jpg | Kate Laine | https://unsplash.com/photos/-huZoi4i8Tw |
 | images/products/spiced-amber.jpg | No Revisions | https://unsplash.com/photos/OAW0OCLn52I |
-| images/products/golden-fig-diffuser.jpg | Carl Elmer | https://unsplash.com/photos/UfoVT7qDKWU |
 | images/products/santal-noir.jpg | Juliet Swiegers | https://unsplash.com/photos/BYBs-zeLlx8 |
 | images/products/golden-fig.jpg | Julee Juu | https://unsplash.com/photos/KYEAFswmLNo |
 | images/products/passport.jpg | pmv chamara | https://unsplash.com/photos/KLU0scqbKQ0 |
@@ -29,6 +28,10 @@ All product and tile photos are placeholders from [Unsplash](https://unsplash.co
 | images/products/satsuma.jpg | No Revisions | https://unsplash.com/photos/CU8ujrbkvCM |
 | images/products/heights.jpg | Mediamodifier | https://unsplash.com/photos/s5C17CQLJsU |
 | images/products/discovery.jpg | shri | https://unsplash.com/photos/BiyhD1JOLA4 |
+| images/products/sandalwood-diffuser.jpg | Mary Skrynnikova | https://unsplash.com/photos/Ixv3dz036jQ |
+| images/products/vanilla-smoke-diffuser.jpg | victoria. | https://unsplash.com/photos/35rWmGXSK7U |
+| images/products/spiced-amber-diffuser.jpg | Shashi Chaturvedula | https://unsplash.com/photos/0olnnoM1ieM |
+| images/products/golden-fig-diffuser.jpg | Eugenia Pan'kiv | https://unsplash.com/photos/EOku9A5wFPU |
 | images/tiles/subscribe.jpg | Laura Chouette | https://unsplash.com/photos/pRjVd0OWYZs |
 | images/tiles/bundle.jpg | Svitlana | https://unsplash.com/photos/iHGVTrpHlAU |
 | images/tiles/cat-candles.jpg | Joyce G | https://unsplash.com/photos/3y9ymqvRR_s |
